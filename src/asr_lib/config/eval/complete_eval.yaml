@@ -1,0 +1,151 @@
+name: Complete ASR Models Evaluation
+codename: asr-eval-v1-2025Q2
+
+metrics:
+  - WER
+  - CER
+  - MER
+  - WIL
+
+normalization_types:
+  - none
+  - all
+  - lowercase
+  - whitespace
+  - punctuation
+  - tags
+
+datasets:
+  # NOTE: Transcriptions for the test split are not provided, can only use validation split
+  - name: amu-cai/pl-asr-bigos-v2
+    subsets:
+      - pjatk-clarin_studio-15
+      - pjatk-clarin_mobile-15
+      - pwr-maleset-unk
+      - pwr-shortwords-unk
+      - pwr-viu-unk
+      - pwr-azon_read-20
+      - pwr-azon_spont-20
+      - polyai-minds14-21
+    splits:
+      - validation
+    audio_path_col_name: audiopath_local
+    audio_data_col_name: audio-array
+    text_col_name: ref_orig
+    max_samples_per_subset: 300
+    streaming: true
+
+  - name: facebook/multilingual_librispeech
+    subsets:
+      - polish
+    splits:
+      - test
+    audio_path_col_name: path
+    audio_data_col_name: audio-array
+    text_col_name: transcript
+    max_samples_per_subset: 300
+    streaming: true
+
+  - name: mozilla-foundation/common_voice_17_0
+    subsets:
+      - pl
+    splits:
+      - test
+    audio_path_col_name: path
+    audio_data_col_name: audio-array
+    text_col_name: sentence
+    max_samples_per_subset: 300
+    streaming: true
+
+  - name: google/fleurs
+    subsets:
+      - pl_pl
+    splits:
+      - test
+    audio_path_col_name: path
+    audio_data_col_name: audio-array
+    text_col_name: raw_transcription
+    max_samples_per_subset: 300
+    metadata_columns:
+      - transcription
+    streaming: true
+
+asr_models:
+  # - name: whisper_local
+  #   use_huggingface: false
+  #   providers:
+  #     - openai
+  #   models:
+  #     - tiny
+  #     - small
+  #     - medium
+  #     - large-v2
+  #     - large-v3
+  #     - large-v3-turbo
+  #   versions:
+  #     - 2024Q1
+
+  - name: whisper_local
+    use_huggingface: true
+    providers:
+      - openai
+    models:
+      - whisper-tiny
+      - whisper-small
+      - whisper-base
+      - whisper-medium
+      - whisper-large
+      - whisper-large-v2
+      - whisper-large-v3
+      - whisper-large-v3-turbo
+    versions:
+      - 2022Q3
+      - 2022Q3
+      - 2022Q4
+      - 2022Q4
+      - 2022Q4
+      - 2022Q4
+      - 2023Q4
+      - 2024Q4
+
+  - name: meta-w2v
+    use_huggingface: true
+    providers:
+      - CDPlayer
+      - jonatasgrosman
+      - facebook
+    models:
+      - w2v-bert-2.0-polish-CV17.0
+      - wav2vec2-xls-r-1b-polish
+      - mms-1b-all
+    versions:
+      - 2025Q1
+      - 2022Q1
+      - 2023Q2
+
+  - name: meta-seamless
+    use_huggingface: true
+    providers:
+      - facebook
+    models:
+      - hf-seamless-m4t-medium
+      - hf-seamless-m4t-large
+      - seamless-m4t-v2-large
+    versions:
+      - 2024Q1
+
+  - name: nvidia_nemo
+    use_huggingface: false
+    providers:
+      - nvidia
+    models:
+      - stt_multilingual_fastconformer_hybrid_large_pc
+      - stt_pl_fastconformer_hybrid_large_pc
+    versions:
+      - 2023Q3
+
+asr_model_params:
+  use_gpu: true
+  dtype: float16
+  sampling_rate: 16000
+  max_audio_length_in_seconds: 300

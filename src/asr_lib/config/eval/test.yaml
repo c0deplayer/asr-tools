@@ -1,0 +1,79 @@
+name: test
+codename: test
+
+metrics:
+  - WER
+  - CER
+  - MER
+  - WIL
+
+normalization_types:
+  - none
+  - all
+  - lowercase
+  - whitespace
+  - punctuation
+  - tags
+
+datasets:
+  # NOTE: Transcriptions for the test split are not provided, can only use validation split
+  # - name: amu-cai/pl-asr-bigos-v2
+  #   subsets:
+  #     - pjatk-clarin_studio-15
+  #   splits:
+  #     - validation
+  #   audio_path_col_name: audiopath_local
+  #   audio_data_col_name: audio-array
+  #   text_col_name: ref_orig
+  #   max_samples_per_subset: 10
+  #   streaming: true
+
+  - name: facebook/multilingual_librispeech
+    subsets:
+      - polish
+    splits:
+      - test
+    audio_path_col_name: path
+    audio_data_col_name: audio-array
+    text_col_name: transcript
+    max_samples_per_subset: 10
+    streaming: true
+
+    # TODO: If train split does not exist, we should manually create it
+    # by intercepting specific exceptions
+  # - name: PolyAI/minds14
+  #   subsets:
+  #     - pl-PL
+  #   splits:
+  #     - train
+  #   audio_path_col_name: path
+  #   audio_data_col_name: audio-array
+  #   max_samples_per_subset: 3
+  #   text_col_name: transcription
+  #   streaming: true
+
+asr_models:
+  - name: whisper_local
+    use_huggingface: true
+    providers:
+      - openai
+    models:
+      - whisper-small
+      - whisper-large-v3-turbo
+    versions:
+      - 2024Q1
+
+  - name: meta-w2v
+    use_huggingface: true
+    providers:
+      - CDPlayer
+    models:
+      - w2v-bert-2.0-polish-CV17.0
+    versions:
+      - 2025Q1
+
+asr_model_params:
+  use_gpu: true
+  dtype: float16
+  sampling_rate: 16000
+  max_audio_length_in_seconds: 300

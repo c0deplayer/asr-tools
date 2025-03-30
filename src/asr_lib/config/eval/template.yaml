@@ -1,0 +1,62 @@
+# Main test configuration section
+name: your_test_name_here # Replace with your test name (e.g., "Whisper Model Evaluation")
+codename: your_test_codename_here # Replace with a short codename for your test (e.g., "whisper_eval_2023")
+
+# Metrics configuration section
+# Define which metrics will be used to evaluate the ASR performance
+metrics:
+  - WER # Word Error Rate - Standard metric for ASR evaluation
+  # Other available metrics you can add:
+  # - CER  # Character Error Rate - Useful for character-based languages or fine-grained analysis
+  # - WIL # Word Information Loss - Measures the loss of information due to word errors
+  # - MER # Match Error Rate - Measures the number of matches between predicted and reference transcripts
+
+# Text normalization options to apply during evaluation
+# You can include any combination of these options:
+normalization_types:
+  - none # No normalization applied
+  - all # Apply all normalizations below
+  - lowercase # Convert all text to lowercase
+  - whitespace # Normalize whitespace/blank characters
+  - punctuation # Remove punctuation
+  - tags # Remove special tags like <unk>, <silence>, etc.
+
+# Dataset configuration
+datasets:
+  - name: your_dataset_name # Dataset name (e.g., huggingface path like "mozilla-foundation/common_voice_11_0" or local path)
+    subsets:
+      - subset_name # Specific subset of dataset to use (e.g., "en" for English in Common Voice)
+    splits:
+      - test # Which split to use: train, test, validation, etc.
+    audio_path_col_name: audio_column_name # Name of the audio column in the dataset for audio paths (e.g., "audio" or "path")
+    audio_data_col_name: audio_data_column_name # Name of the audio column in the dataset for audio data dictionary (e.g., "audio" or "data")
+    text_col_name: transcript_column_name # REQUIRED: Name of the transcript/reference column containing ground truth text
+    max_samples_per_subset: 100 # Maximum samples to process per subset (adjust based on needs)
+    metadata_columns: # Columns to include in evaluation metadata
+      - transcript_column_name # Eg. ref_orig, speaker_id, or any other column to preserve
+
+# Here we provide all the models that are going to be used for evaluation
+asr_models:
+  # Models are separated by the main group
+  - name: model_group_name # Group name for your models (e.g., "whisper_models" or "commercial_asr")
+    use_huggingface: true # Set to true if using Hugging Face models, false for API-based or local providers
+    providers: # List of model providers (must have either 1 entry or match the number of models)
+      - provider1 # E.g., openai, anthropic, local, etc.
+      - provider2 # Must match the number of models if more than 1 provider is specified
+    models: # List of model names to evaluate
+      - model_name1 # E.g., whisper-small, openai/whisper-large-v3
+      - model_name2 # E.g., whisper-large-v3, facebook/wav2vec2-large-960h
+    versions: # Optional: specify model versions (must have either 1 entry or match the number of models)
+      - version_id # E.g., 2024Q1
+
+# Parameters that are going to be used by all models
+# Here are all the available parameters that can be used
+asr_model_params:
+  use_gpu: true # RECOMMENDED: Whether to use GPU acceleration
+  dtype: float32 # Model precision type
+  sampling_rate: 16000 # Audio sampling rate in Hz
+  max_audio_length_in_seconds: 300 # Maximum audio length to process
+  # Optional additional parameters:
+  # batch_size: 16  # Batch size for processing
+  # num_beams: 5  # Number of beams for beam search
+  # chunk_length_s: 30  # Length of audio chunks in seconds

@@ -1,0 +1,5 @@
+handlers:
+  - sink: ext://sys.stdout
+    format: "<green>{time:YYYY-MM-DD HH:mm:ss}</green> >>> <level>{message}</level>"
+    level: DEBUG
+    colorize: true
